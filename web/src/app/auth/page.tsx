@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { postAction } from "@/lib/utils/apiRequests";
+import { Logo } from "@/components/shared/logo";
 
 export default function AuthPage() {
   const { data: session, status } = useSession();
@@ -26,13 +27,6 @@ export default function AuthPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
 
   const toggleVariant = () => {
     setVariant(variant === "LOGIN" ? "REGISTER" : "LOGIN");
@@ -58,25 +52,27 @@ export default function AuthPage() {
           email,
           password,
           redirect: false,
+          callbackUrl: "/connectorwiz",
         });
 
-        if (loginRes?.error) {
+        if (!loginRes?.error) {
+          router.push(loginRes.url || "/connectorwiz");
+        } else {
           throw new Error("Account created, but auto-login failed. Please sign in manually.");
         }
-
-        router.push("/");
       } else {
         const res = await signIn("credentials", {
           email,
           password,
           redirect: false,
+          callbackUrl: "/connectorwiz",
         });
 
-        if (res?.error) {
+        if (!res?.error) {
+          router.push(res.url || "/connectorwiz");
+        } else {
           throw new Error("Invalid email or password");
         }
-
-        router.push("/");
       }
     } catch (err: any) {
       setError(err.message);
@@ -100,15 +96,8 @@ export default function AuthPage() {
     <div className="min-h-screen w-full flex bg-white font-sans text-slate-900">
       
       <div className="hidden lg:flex w-1/2 bg-[#F0F6FF] flex-col justify-between p-12 relative overflow-hidden">
-        {/* Logo */}
-        <div className="flex items-center gap-2 relative z-10">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg">
-            <img src="/logo.svg" alt="" />
-          </div>
-          <span className="text-xl font-bold text-slate-900 tracking-tight">BrokerFlow</span>
-        </div>
+        <Logo/>
 
-        {/* Illustration */}
         <div className="flex-1 flex flex-col items-center justify-center relative z-10">
           <div className="relative w-full max-w-lg aspect-[4/3]">
              {/* Custom SVG Illustration imitating the reference */}
@@ -198,18 +187,6 @@ export default function AuthPage() {
               {isLoading ? "Processing..." : variant === "LOGIN" ? "Sign In" : "Sign Up"}
             </button>
           </form>
-
-          {/* Social Login */}
-          <div className="mt-8">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-slate-500">Or {variant === "LOGIN" ? "Sign In" : "Sign Up"} with</span>
-              </div>
-            </div>
-          </div>
 
           <p className="mt-8 text-center text-sm text-slate-600">
             {variant === "LOGIN" ? "Not registered yet?" : "Already have an account?"}{" "}
