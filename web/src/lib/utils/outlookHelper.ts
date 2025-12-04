@@ -77,3 +77,26 @@ export async function getMicrosoftToken(userId: string): Promise<string> {
     throw error;
   }
 }
+
+export async function getAttachmentContent(userId: string, messageId: string, attachmentId: string) {
+  const accessToken = await getMicrosoftToken(userId);
+
+  const endpoint = `https://graph.microsoft.com/v1.0/me/messages/${messageId}/attachments/${attachmentId}/$value`;
+
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to download attachment content");
+  }
+
+  // 3. Return the buffer (raw binary data)
+  // If you need Base64 (for frontend display), use .toString('base64') on this buffer
+  // If you need text (for CSVs), use .text()
+  const arrayBuffer = await response.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+}

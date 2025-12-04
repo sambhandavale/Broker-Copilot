@@ -13,23 +13,30 @@ import {
   Laptop,
   Loader2,
   Calendar,
-  Settings
+  Settings,
+  Play,
+  BrainCircuit
 } from 'lucide-react';
 import { NavButton } from './components/NavButton'; // Assuming these exist in your project
 import { Logo } from '@/components/shared/logo';    // Assuming these exist in your project
 import { getAction, patchAction } from '@/lib/utils/apiRequests'; // Importing your util functions
 import { useRouter, useSearchParams } from 'next/navigation';
+import Papa from 'papaparse';
 
 const ConnectPage = () => {
   const [activeTab, setActiveTab] = useState('broker');
   const [loading, setLoading] = useState<string | null>(null);
+  
+  // Pipeline State
+  const [csvData, setCsvData] = useState<any[]>([]); // Store parsed CSV
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState(0);
 
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const [renewalDays, setRenewalDays] = useState<number>(90);
   
-  // State to track actual connection status
   const [connections, setConnections] = useState({
     ams: false,
     gmail: false,
@@ -37,27 +44,35 @@ const ConnectPage = () => {
     csv: false
   });
 
+  // --- ANALYSIS STEPS MESSAGES ---
+  const processingSteps = [
+    "Reading Client Data...",
+    "Identifying Upcoming Renewals...",
+    "Connecting to Outlook...",
+    "Fetching Client Emails...",
+    "AI Agent: Analyzing Sentiment...",
+    "AI Agent: Generating Renewal Briefs...",
+    "Finalizing Pipeline..."
+  ];
+
   useEffect(() => {
     const connectionParam = searchParams.get('connection');
     const statusParam = searchParams.get('status');
 
     if (connectionParam === 'outlook' && statusParam === 'success') {
       setConnections(prev => ({ ...prev, outlook: true, gmail: false }));
-      
       setActiveTab('email');
-
-      router.replace('/connectorwiz');
+      router.replace('/connectorwiz'); // Clear params
     }
   }, [searchParams, router]);
 
   useEffect(() => {
     const checkStatus = async () => {
       try {
+
         const res = await getAction('/api/users/me');
         if (res.user.microsoft?.tokenExpiresAt) setConnections(prev => ({ ...prev, outlook: true }));
-        if (res.user.settings?.renewalWindowDays) {
-            setRenewalDays(res.user.settings.renewalWindowDays);
-        }
+        if (res.user.settings?.renewalWindowDays) setRenewalDays(res.user.settings.renewalWindowDays);
       } catch (error) {
         console.error("Failed to fetch connection status");
       }
@@ -65,41 +80,94 @@ const ConnectPage = () => {
     checkStatus();
   }, []);
 
+  // --- HANDLERS ---
+
+  const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setLoading('csv');
+    
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        setCsvData(results.data);
+        setConnections(prev => ({ ...prev, csv: true }));
+        setLoading(null);
+        console.log("Parsed CSV:", results.data.length, "rows");
+      },
+      error: (error) => {
+        console.error("CSV Error:", error);
+        setLoading(null);
+        alert("Failed to parse CSV file");
+      }
+    });
+  };
+
+  const handleStartAnalysis = async () => {
+    if (!connections.csv || (!connections.outlook && !connections.gmail)) return;
+
+    setIsAnalyzing(true);
+    setAnalysisStep(0);
+
+    // Simulated Progress Loop (Replace with real progress if using websockets)
+    const interval = setInterval(() => {
+      setAnalysisStep(prev => (prev < processingSteps.length - 1 ? prev + 1 : prev));
+    }, 1500);
+
+    try {
+      // THE REAL API CALL
+      const response = await fetch('/api/data-pipeline/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          csvData: csvData,
+          windowDays: renewalDays
+        })
+      });
+
+      if (!response.ok) throw new Error("Analysis failed");
+
+      console.log(response);
+
+      // On Success
+      clearInterval(interval);
+      setAnalysisStep(processingSteps.length - 1);
+      
+      // setTimeout(() => {
+      //   router.push('/dashboard/pipeline'); // Redirect to result page
+      // }, 1000);
+
+    } catch (error) {
+      console.error(error);
+      clearInterval(interval);
+      setIsAnalyzing(false);
+      alert("Pipeline generation failed. Please try again.");
+    }
+  };
+
   const handleSaveSettings = async (days: number) => {
     setLoading('settings');
     try {
-        // Optimistic update
-        setRenewalDays(days);
-        
-        // API Call
-        await patchAction('/api/users/settings', {
-            renewalWindowDays: days
-        });
-
+      setRenewalDays(days);
+      await patchAction('/api/users/settings', { renewalWindowDays: days });
     } catch (error) {
-        console.error("Failed to update settings");
-        // Revert on error if needed, or show toast
+      console.error("Failed to update settings");
     } finally {
-        setLoading(null);
+      setLoading(null);
     }
   };
 
   const handleConnect = async (service: string) => {
     if (service === 'outlook') {
       if (connections.outlook) return;
-
       setLoading('outlook');
       try {
         const response = await getAction<{ url: string }>('/api/auth/microsoft/connect');
-        
-        if (response.url) {
-          window.location.href = response.url;
-        } else {
-          throw new Error("No redirect URL received"); 
-        }
+        if (response.url) window.location.href = response.url;
       } catch (error: any) {
         console.error("Outlook connection failed:", error);
-        alert(error.message || "Failed to initiate connection");
         setLoading(null);
       }
       return;
@@ -109,19 +177,14 @@ const ConnectPage = () => {
     setTimeout(() => {
       setConnections(prev => {
         setLoading(null);
-        if (service === 'gmail') {
-          return { ...prev, gmail: !prev.gmail, outlook: false };
-        }
-        if (service === 'ams') {
-           return { ...prev, [service]: !prev[service] };
-        }
-        if (service === 'csv') {
-           return { ...prev, [service]: !prev[service] };
-        }
+        if (service === 'gmail') return { ...prev, gmail: !prev.gmail, outlook: false };
+        if (service === 'ams') return { ...prev, [service]: !prev[service] };
         return prev;
       });
     }, 800);
   };
+
+  // --- RENDER CONTENT ---
 
   const renderContent = () => {
     switch (activeTab) {
@@ -133,7 +196,7 @@ const ConnectPage = () => {
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Connect AMS Broker</h3>
             <p className="text-gray-500 mb-8 max-w-xs">
-              Securely link your Asset Management System account to sync portfolio data in real-time.
+              Securely link your Asset Management System account to sync portfolio data.
             </p>
             
             {connections.ams ? (
@@ -164,11 +227,7 @@ const ConnectPage = () => {
                   disabled={loading === 'ams'}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  {loading === 'ams' ? (
-                    <Loader2 className="animate-spin" size={20} />
-                  ) : (
-                    <>Connect Account <ArrowRight size={16} /></>
-                  )}
+                  {loading === 'ams' ? <Loader2 className="animate-spin" size={20} /> : <>Connect Account <ArrowRight size={16} /></>}
                 </button>
               </div>
             )}
@@ -204,21 +263,13 @@ const ConnectPage = () => {
                   </div>
                   <div className="text-left">
                     <span className={`block font-semibold ${connections.gmail ? 'text-red-900' : 'text-gray-700'}`}>Gmail</span>
-                    <span className="text-xs text-gray-500">
-                      {connections.gmail ? 'Active Provider' : connections.outlook ? 'Switch to Gmail' : 'Connect'}
-                    </span>
+                    <span className="text-xs text-gray-500">{connections.gmail ? 'Active Provider' : 'Connect'}</span>
                   </div>
                 </div>
-                {loading === 'gmail' ? (
-                   <Loader2 size={20} className="text-red-600 animate-spin" />
-                ) : connections.gmail ? (
-                   <CheckCircle2 size={20} className="text-red-600" />
-                ) : (
-                   <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-red-400" />
-                )}
+                {loading === 'gmail' ? <Loader2 size={20} className="text-red-600 animate-spin" /> : connections.gmail ? <CheckCircle2 size={20} className="text-red-600" /> : <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-red-400" />}
               </button>
 
-              {/* OUTLOOK BUTTON (Connected to API) */}
+              {/* OUTLOOK BUTTON */}
               <button 
                 onClick={() => handleConnect('outlook')}
                 disabled={loading === 'outlook' || loading === 'gmail'}
@@ -236,19 +287,10 @@ const ConnectPage = () => {
                   </div>
                   <div className="text-left">
                     <span className={`block font-semibold ${connections.outlook ? 'text-blue-900' : 'text-gray-700'}`}>Outlook</span>
-                    <span className="text-xs text-gray-500">
-                       {connections.outlook ? 'Active Provider' : connections.gmail ? 'Switch to Outlook' : 'Connect'}
-                    </span>
+                    <span className="text-xs text-gray-500">{connections.outlook ? 'Active Provider' : 'Connect'}</span>
                   </div>
                 </div>
-                
-                {loading === 'outlook' ? (
-                  <Loader2 size={20} className="text-blue-600 animate-spin" />
-                ) : connections.outlook ? (
-                  <CheckCircle2 size={20} className="text-blue-600" />
-                ) : (
-                  <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-blue-400" />
-                )}
+                {loading === 'outlook' ? <Loader2 size={20} className="text-blue-600 animate-spin" /> : connections.outlook ? <CheckCircle2 size={20} className="text-blue-600" /> : <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-blue-400" />}
               </button>
             </div>
           </div>
@@ -264,20 +306,28 @@ const ConnectPage = () => {
               Upload your client database via CSV to instantly populate your dashboard.
             </p>
 
-            <div 
-              className={`w-full max-w-xs border-2 border-dashed rounded-2xl p-8 transition-all cursor-pointer ${connections.csv ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 hover:border-emerald-400 hover:bg-gray-50'}`}
-              onClick={() => handleConnect('csv')}
+            {/* CSV UPLOAD INPUT */}
+            <label 
+              className={`w-full max-w-xs border-2 border-dashed rounded-2xl p-8 transition-all cursor-pointer relative ${connections.csv ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 hover:border-emerald-400 hover:bg-gray-50'}`}
             >
+              <input 
+                type="file" 
+                accept=".csv"
+                onChange={handleCsvUpload}
+                disabled={loading === 'csv'}
+                className="hidden" 
+              />
+              
               {loading === 'csv' ? (
                  <div className="flex flex-col items-center gap-2">
                    <Loader2 size={24} className="text-emerald-500 animate-spin mb-2" />
-                   <span className="text-sm font-medium text-emerald-800">Uploading...</span>
+                   <span className="text-sm font-medium text-emerald-800">Parsing Data...</span>
                  </div>
               ) : connections.csv ? (
                 <div className="flex flex-col items-center gap-2">
                    <CheckCircle2 size={32} className="text-emerald-500 mb-2" />
-                   <span className="text-sm font-semibold text-emerald-800">clients_v2.csv</span>
-                   <span className="text-xs text-emerald-600">Upload Complete</span>
+                   <span className="text-sm font-semibold text-emerald-800">Upload Complete</span>
+                   <span className="text-xs text-emerald-600">{csvData.length} records found</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2">
@@ -286,7 +336,7 @@ const ConnectPage = () => {
                   <span className="text-xs text-gray-400">or drag and drop</span>
                 </div>
               )}
-            </div>
+            </label>
           </div>
         );
       
@@ -294,16 +344,10 @@ const ConnectPage = () => {
         return (
           <div className="h-full flex flex-col justify-center items-center text-center p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
-              <Calendar size={32} />
+              <CalendarIcon /> 
             </div>
-
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Renewal Tracking Window
-            </h3>
-
-            <p className="text-gray-500 mb-8 max-w-xs">
-              Select how far in advance we should flag upcoming policy renewals.
-            </p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Renewal Tracking Window</h3>
+            <p className="text-gray-500 mb-8 max-w-xs">Select how far in advance we should flag upcoming policy renewals.</p>
 
             <div className="w-full max-w-xs grid grid-cols-3 gap-3">
               {[30, 90, 180].map((days) => (
@@ -311,22 +355,14 @@ const ConnectPage = () => {
                   key={days}
                   onClick={() => handleSaveSettings(days)}
                   disabled={loading === 'settings'}
-                  className={`
-                    relative flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all
-                    ${renewalDays === days
-                      ? 'border-indigo-600 bg-indigo-50 text-indigo-900'
-                      : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:bg-gray-50'
-                    }
-                  `}
+                  className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${renewalDays === days ? 'border-indigo-600 bg-indigo-50 text-indigo-900' : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:bg-gray-50'}`}
                 >
                   {loading === 'settings' && renewalDays === days ? (
                     <Loader2 size={24} className="animate-spin text-indigo-600" />
                   ) : (
                     <>
                       <span className="text-2xl font-bold">{days}</span>
-                      <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">
-                        Days
-                      </span>
+                      <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Days</span>
                       {renewalDays === days && (
                         <div className="absolute -top-2 -right-2 bg-indigo-600 text-white rounded-full p-1 shadow-sm">
                           <CheckCircle2 size={12} />
@@ -337,103 +373,103 @@ const ConnectPage = () => {
                 </button>
               ))}
             </div>
-
-            <p className="text-xs text-gray-400 mt-6">
-              Your preferences are saved automatically.
-            </p>
           </div>
         );
-      default:
-        return null;
+      default: return null;
     }
   };
+
+  const CalendarIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>;
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-gray-900">
       
-      {/* Main Modal Container */}
-      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col-reverse md:flex-row min-h-[600px]">
-        
-        {/* Left Sidebar (Navigation) */}
-        <div className="w-full md:w-[500px] p-8 flex flex-col border-r border-gray-100 bg-white">
+      {/* --- OVERLAY LOADER --- */}
+      {isAnalyzing && (
+        <div className="fixed inset-0 z-50 bg-white/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-300">
+          <div className="relative mb-8">
+            {/* Outer Ring */}
+            <div className="w-24 h-24 rounded-full border-4 border-indigo-100 animate-pulse"></div>
+            {/* Spinning Ring */}
+            <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
+            {/* Icon */}
+            <div className="absolute inset-0 flex items-center justify-center text-indigo-600">
+              <BrainCircuit size={32} />
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Building Your Pipeline</h2>
+          <p className="text-indigo-600 font-medium animate-pulse">
+             {processingSteps[analysisStep]}
+          </p>
+          
+          <div className="mt-8 flex gap-2">
+            {processingSteps.map((_, i) => (
+              <div 
+                key={i} 
+                className={`w-2 h-2 rounded-full transition-colors duration-300 ${i <= analysisStep ? 'bg-indigo-600' : 'bg-gray-200'}`} 
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
+      {/* --- MAIN MODAL --- */}
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col-reverse md:flex-row min-h-[600px] relative z-10">
+        
+        {/* Left Sidebar */}
+        <div className="w-full md:w-[500px] p-8 flex flex-col border-r border-gray-100 bg-white">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Connect Sources</h1>
             <p className="text-gray-500 mt-2 text-sm">Select a provider to link your accounts or import data.</p>
           </div>
 
-          <div className="flex-1 space-y-8 overflow-y-auto pr-2">
-            
-            {/* SECTION 1: DATA CONNECTION */}
+          <div className="flex-1 space-y-6 overflow-y-auto pr-2">
+            {/* Data Connections */}
             <div className="space-y-3">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">
-                Data Connections
-              </h4>
-              
-              <NavButton 
-                active={activeTab === 'csv'} 
-                onClick={() => setActiveTab('csv')}
-                icon={<Upload size={20} />}
-                title="Data Import"
-                subtitle="Upload CSV"
-                connected={connections.csv}
-              />
-
-              <NavButton 
-                active={activeTab === 'broker'} 
-                onClick={() => setActiveTab('broker')}
-                icon={<Building2 size={20} />}
-                title="Broker Account"
-                subtitle="Connect AMS"
-                connected={connections.ams}
-              />
+              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">Data Connections</h4>
+              <NavButton active={activeTab === 'csv'} onClick={() => setActiveTab('csv')} icon={<FileSpreadsheet size={20} />} title="Data Import" subtitle="Upload CSV" connected={connections.csv} />
+              <NavButton active={activeTab === 'broker'} onClick={() => setActiveTab('broker')} icon={<Building2 size={20} />} title="Broker Account" subtitle="Connect AMS" connected={connections.ams} />
             </div>
 
-            {/* SECTION 2: ACCOUNT CONNECTION */}
+            {/* Account Connections */}
             <div className="space-y-3">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">
-                Account Connections
-              </h4>
-              
-              <NavButton 
-                active={activeTab === 'email'} 
-                onClick={() => setActiveTab('email')}
-                icon={<Mail size={20} />}
-                title="Email Services"
-                subtitle="Gmail or Outlook"
-                connected={connections.gmail || connections.outlook}
-              />
+              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">Account Connections</h4>
+              <NavButton active={activeTab === 'email'} onClick={() => setActiveTab('email')} icon={<Mail size={20} />} title="Email Services" subtitle="Gmail or Outlook" connected={connections.gmail || connections.outlook} />
             </div>
 
+            {/* Config */}
             <div className="space-y-3">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">
-                Configuration
-              </h4>
-              
-              <NavButton 
-                active={activeTab === 'settings'} 
-                onClick={() => setActiveTab('settings')}
-                icon={<Settings size={20} />}
-                title="General Settings"
-                subtitle={`${renewalDays} Day Window`}
-                connected={true}
-              />
+              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 ml-1">Configuration</h4>
+              <NavButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon={<Settings size={20} />} title="General Settings" subtitle={`${renewalDays} Day Window`} connected={true} />
             </div>
-
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-100">
-            <div className="mt-4 flex items-center gap-2 text-xs text-gray-400 bg-gray-50 p-3 rounded-lg">
-              <ShieldCheck size={14} className="text-green-500" />
-              <span>All connections are end-to-end encrypted</span>
-            </div>
+          {/* --- THE START ACTION BUTTON --- */}
+          <div className="mt-6 pt-6 border-t border-gray-100">
+             <button
+               onClick={handleStartAnalysis}
+               disabled={!connections.csv || (!connections.outlook && !connections.gmail)}
+               className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-between px-6 group"
+             >
+               <span className="flex flex-col text-left">
+                 <span className="text-sm font-medium opacity-90">Ready to go?</span>
+                 <span className="text-lg">Start Analysis</span>
+               </span>
+               <div className="bg-white/20 p-2 rounded-lg group-hover:bg-white/30 transition-colors">
+                 <Play fill="currentColor" size={20} />
+               </div>
+             </button>
+             
+             {!connections.csv && (
+               <p className="text-xs text-center text-red-400 mt-2">Please upload client CSV first</p>
+             )}
           </div>
         </div>
 
         {/* Right Content Area */}
         <div className="flex-1 bg-gray-50/50 relative">
             <div className="absolute inset-0 bg-gray-100/50 z-0"></div>
-            
             <div className="relative z-10 h-full flex flex-col items-center justify-center p-4">
                 <div className="mb-8 mt-4 md:mt-0">
                     <Logo/>
