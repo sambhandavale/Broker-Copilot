@@ -1,20 +1,14 @@
+import { NextResponse } from "next/server";
 import { generateRenewalPipeline } from "@/lib/services/pipeline";
 import { handleRoute, ApiError } from "@/lib/utils/apiHandler";
+import Renewal from "@/lib/models/Renewal";
 
 export const POST = handleRoute(async ({ req, session }) => {
-  // 1. Authentication Check (Session is already fetched by handleRoute)
   if (!session || !session.user?.email) {
     throw new ApiError("Unauthorized", 401);
   }
-
-  // Handle diverse ID types (NextAuth vs Auth.js adapters)
+  
   const userId = (session.user as any).id || (session.user as any)._id;
-
-  if (!userId) {
-    throw new ApiError("User ID not found in session", 401);
-  }
-
-  // 2. Parse Input
   const body = await req.json();
   const { csvData, windowDays } = body;
 
@@ -22,70 +16,97 @@ export const POST = handleRoute(async ({ req, session }) => {
     throw new ApiError("No CSV data provided", 400);
   }
 
-  // 3. PHASE 1: Data Aggregation (Node.js)
-  // Extract CSV -> Group -> Enrich with Outlook
+  // 1. Generate Pipeline (Raw Data)
   const pipelineResult = await generateRenewalPipeline(
     userId, 
     csvData, 
     parseInt(windowDays) || 90
   );
-
-  console.log(pipelineResult);
-
+  
   if (pipelineResult.data.length === 0) {
-    // Returning an object here automatically becomes NextResponse.json due to handleRoute
-    return { 
-      success: true, 
-      message: "No renewals found in this window.", 
-      count: 0 
-    };
+    return { success: true, message: "No renewals found in this window.", count: 0 };
   }
 
-  // --- DEBUG MODE: STOP HERE ---
-  // Returning the unified data immediately to verify CSV + Outlook merging
+  // 2. Call Python AI Agent
+  const pythonApiUrl = process.env.PYTHON_AGENT_URL || "http://127.0.0.1:8000/analyze";
+  let scoredData;
+
+  try {
+    const aiResponse = await fetch(pythonApiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ raw_data: JSON.stringify(pipelineResult.data) }),
+    });
+
+    if (!aiResponse.ok) {
+      throw new Error(`Python API Error: ${aiResponse.status}`);
+    }
+
+    const aiJson = await aiResponse.json();
+    scoredData = aiJson.data.renewals || aiJson.data;
+
+    console.log("AI Response - ", aiJson);
+
+  } catch (error) {
+    console.error("AI Generation Failed:", error);
+    throw new ApiError("Failed to generate AI scores. Please try again.", 503);
+  }
+
+  // 3. Match AI Results back to Source Data via ID
+  let matchFailures = 0;
+
+  const dbRecords = scoredData.map((score: any) => {
+    // ROBUST MATCHING
+    const originalCtx = pipelineResult.data.find((c: any) => c.id === score.record_id);
+
+    if (!originalCtx) {
+      console.warn(`AI returned ID ${score.record_id} but it wasn't found in source.`);
+      matchFailures++;
+      return null;
+    }
+
+    return {
+      brokerId: userId,
+      clientId: originalCtx.client.id,
+      clientName: originalCtx.client.name,
+      email: originalCtx.client.email,
+      company: originalCtx.client.company,
+      policies: originalCtx.policies || [],
+      renewalDate: originalCtx.policies[0]?.expiryDate,
+      totalPremium: score.total_premium,
+
+      // Rich Analysis Object
+      aiAnalysis: {
+        score: score.score,
+        rank: score.rank,
+        status: score.status,
+        
+        // Narrative
+        reasoning: score.reasoning, 
+        
+        // Lists
+        risk_factors: score.risk_factors || [],
+        positive_factors: score.positive_factors || [],
+        talking_points: score.talking_points || [],
+        upsell_opportunity: score.upsell_opportunity,
+        
+        recommendedAction: score.recommended_action,
+        keyReferences: score.key_references,
+        analyzedAt: new Date()
+      }
+    };
+  }).filter((record: any) => record !== null);
+
+  // 4. Save to MongoDB
+  if (dbRecords.length > 0) {
+    await Renewal.insertMany(dbRecords);
+  }
+
   return {
     success: true,
-    message: "Debug: Unified Data Generated",
-    count: pipelineResult.data.length,
-    data: pipelineResult.data 
+    message: "Pipeline generated successfully",
+    count: dbRecords.length,
+    failures: matchFailures,
+    redirectUrl: "/dashboard/pipeline"
   };
-
-  /* // --- TEMPORARILY DISABLED FOR DEBUGGING ---
-
-  // 4. PHASE 2: Intelligence (Python/Agent)
-  // Send the unified context to the Scorer Agent
-  // const scoredResults = await scorePipelineWithAI(pipelineResult.data);
-
-  // 5. PHASE 3: Storage (MongoDB)
-  // await connectToDB(); // You might not need this if handleRoute calls dbConnect()
-
-  // Optional: Clear previous pipeline for this user to avoid duplicates?
-  // await Renewal.deleteMany({ brokerId: userId });
-
-  // Merge the AI Result with the Original Policy Data to create DB Records
-  // const dbRecords = scoredResults.map(score => {
-  //   const originalCtx = pipelineResult.data.find(
-  //     c => c.client.email === score.client_email
-  //   );
-
-  //   return {
-  //     brokerId: userId,
-  //     clientName: originalCtx?.client.name,
-  //     clientId: originalCtx?.client.id,
-  //     email: originalCtx?.client.email,
-  //     // ... map other fields
-  //   };
-  // });
-
-  // Bulk Insert
-  // await Renewal.insertMany(dbRecords);
-
-  // 6. Return Success
-  // return {
-  //   success: true,
-  //   count: dbRecords.length,
-  //   message: "Pipeline generated successfully",
-  //   redirectUrl: "/dashboard/pipeline"
-  // };
-  */
 });

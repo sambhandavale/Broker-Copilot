@@ -1,0 +1,25 @@
+{
+  "emails": [
+    {
+      "id": "MSG-201",
+      "client_id": "C-102",
+      "subject": "Competitor quote from Geico",
+      "snippet": "We received a quote 15% cheaper...",
+      "date": "2025-11-28"
+    },
+    {
+      "id": "MSG-202",
+      "client_id": "C-102",
+      "subject": "Policy Renewal Reminder",
+      "snippet": "Your policy will expire soon.",
+      "date": "2025-11-27"
+    },
+    {
+      "id": "MSG-203",
+      "client_id": "C-102",
+      "subject": "Client Feedback",
+      "snippet": "We are unhappy with the recent price increase.",
+      "date": "2025-11-29"
+    }
+  ]
+}

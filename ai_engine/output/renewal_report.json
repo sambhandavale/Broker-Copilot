@@ -1,0 +1,109 @@
+{
+  "renewals": [
+    {
+      "rank": 1,
+      "client_name": "Rahul Sharma",
+      "total_premium": 25000,
+      "score": 90,
+      "status": "Critical",
+      "reasoning": "Urgent medical procedure requiring immediate endorsement and escalation.",
+      "key_references": [
+        {
+          "source_id": "E004",
+          "snippet": "Our LIC endorsement request is still pending after 12 days. The employee needs the e-card urgently for a medical procedure this week."
+        }
+      ],
+      "recommended_action": "Immediately escalate the endorsement request with LIC and explore alternative solutions to provide the employee with the e-card for their medical procedure."
+    },
+    {
+      "rank": 2,
+      "client_name": "Apex Logistics Ltd",
+      "total_premium": 130000,
+      "score": 85,
+      "status": "High",
+      "reasoning": "High premium, nearing expiry, and client is concerned about cyber security risks and policy terms. Potential for multi-policy discount.",
+      "key_references": [
+        {
+          "source_id": "E001",
+          "snippet": "Urgent: Cyber Policy Renewal \u2013 Apex Logistics"
+        },
+        {
+          "source_id": "E001",
+          "snippet": "Given the recent rise in attacks across the logistics industry, our board wants to ensure that the renewal terms, especially the retroactive date and ransomware sublimits, are properly reviewed."
+        },
+        {
+          "source_id": "E001",
+          "snippet": "Please send us the updated quote, revised policy wording if any, and confirmation on whether Chubb is increasing premiums this year. We also want to understand if multi-policy discounts can be applied since we also have the fleet coverage with Tata AIG."
+        }
+      ],
+      "recommended_action": "Prioritize sending the updated quote and policy wording, address concerns about cyber risks and policy terms, and explore multi-policy discount options."
+    },
+    {
+      "rank": 3,
+      "client_name": "Global Textile Exports",
+      "total_premium": 62000,
+      "score": 75,
+      "status": "High",
+      "reasoning": "Active claim due to damaged shipment indicates potential dissatisfaction. Requires immediate attention to the claim process.",
+      "key_references": [
+        {
+          "source_id": "E008",
+          "snippet": "Marine Shipment Damaged \u2013 POL-MARINE-22219"
+        },
+        {
+          "source_id": "E008",
+          "snippet": "Our shipment from Surat arrived with water damage and torn packaging. We need to file a claim under POL-MARINE-22219. Please advise on the next steps including surveyor appointment, required documents, and estimated timeline."
+        }
+      ],
+      "recommended_action": "Expedite the claim process, provide clear guidance on the required documents and timeline, and ensure client satisfaction to mitigate potential churn."
+    },
+    {
+      "rank": 4,
+      "client_name": "BrightMart Retail Pvt Ltd",
+      "total_premium": 38000,
+      "score": 65,
+      "status": "Medium",
+      "reasoning": "Client requesting premium breakdown, indicating a need for clarification and potential price sensitivity. Previous claim suggests a need to review coverage adequacy.",
+      "key_references": [
+        {
+          "source_id": "E007",
+          "snippet": "Fire & Burglary \u2013 Premium Breakup Request"
+        },
+        {
+          "source_id": "E007",
+          "snippet": "We need a detailed premium breakdown for Fire & Burglary policy POL-FIR-77120. Please include building coverage, stock coverage, burglary add-ons, and GST charges."
+        }
+      ],
+      "recommended_action": "Provide a detailed premium breakdown, address any concerns about pricing, and review coverage adequacy in light of the previous claim."
+    },
+    {
+      "rank": 5,
+      "client_name": "OmniTech Software Pvt Ltd",
+      "total_premium": 78000,
+      "score": 50,
+      "status": "Medium",
+      "reasoning": "D&O policy is due for renewal. Cyber Liability policy not up for renewal currently. No immediate concerns or urgent requests.",
+      "key_references": [],
+      "recommended_action": "Initiate the renewal process for the D&O policy, highlighting the value and benefits of continued coverage. Check for upselling opportunities."
+    },
+    {
+      "rank": 6,
+      "client_name": "Dr. Sarah Jenkins",
+      "total_premium": 12000,
+      "score": 20,
+      "status": "Low",
+      "reasoning": "Positive feedback indicates high satisfaction and low churn risk. Renewal process should be straightforward.",
+      "key_references": [
+        {
+          "source_id": "E006",
+          "snippet": "Positive Feedback \u2013 Professional Indemnity"
+        },
+        {
+          "source_id": "E010",
+          "snippet": "Thank you for your prompt support regarding the Professional Indemnity policy POL-MED-11022. Your guidance on coverage and documentation has been invaluable, and the process went very smoothly."
+        }
+      ],
+      "recommended_action": "Maintain the positive relationship, offer a smooth renewal process, and explore opportunities for additional coverage or referrals."
+    }
+  ]
+}

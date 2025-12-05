@@ -118,7 +118,7 @@ const ConnectPage = () => {
 
     try {
       // THE REAL API CALL
-      const response = await fetch('/api/data-pipeline/start', {
+      const response = await fetch('/api/pipeline/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -135,9 +135,9 @@ const ConnectPage = () => {
       clearInterval(interval);
       setAnalysisStep(processingSteps.length - 1);
       
-      // setTimeout(() => {
-      //   router.push('/dashboard/pipeline'); // Redirect to result page
-      // }, 1000);
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
 
     } catch (error) {
       console.error(error);

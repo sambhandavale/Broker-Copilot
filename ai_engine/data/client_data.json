@@ -1,0 +1,497 @@
+[
+
+        {
+
+            "id": "WF-1764885241607-98",
+
+            "client": {
+
+                "id": "C-101",
+
+                "name": "Apex Logistics Ltd",
+
+                "email": "director@apexlogistics.com",
+
+                "phone": "-153232",
+
+                "company": "Apex Logistics",
+
+                "accountManager": "Priya Singh"
+
+            },
+
+            "policies": [
+
+                {
+
+                    "policyNumber": "POL-CYB-99281",
+
+                    "carrier": "Chubb",
+
+                    "type": "Cyber Liability",
+
+                    "expiryDate": "20-12-2025",
+
+                    "premium": 85000,
+
+                    "status": "Active",
+
+                    "claimsCount": 2,
+
+                    "isDueForRenewal": true
+
+                },
+
+                {
+
+                    "policyNumber": "POL-FLEET-7721",
+
+                    "carrier": "Tata AIG",
+
+                    "type": "Commercial Fleet",
+
+                    "expiryDate": "01-02-2026",
+
+                    "premium": 45000,
+
+                    "status": "Active",
+
+                    "claimsCount": 0,
+
+                    "isDueForRenewal": true
+
+                }
+
+            ],
+
+            "emails": [
+
+                {
+
+                    "id": "E001",
+
+                    "subject": "Urgent: Cyber Policy Renewal – Apex Logistics",
+
+                    "body": "Hi Priya,\r\n\r\nHope you're doing well. I wanted to follow up regarding our Cyber Liability policy (POL-CYB-99281) which is due for renewal later this month. Given the recent rise in attacks across the logistics industry, our board wants to ensure that the renewal terms, especially the retroactive date and ransomware sublimits, are properly reviewed.\r\n\r\nPlease send us the updated quote, revised policy wording if any, and confirmation on whether Chubb is increasing premiums this year. We also want to understand if multi-policy discounts can be applied since we also have the fleet coverage with Tata AIG.\r\nThis is time-sensitive as our IT audit is scheduled for next week. Kindly prioritise.\r\n\r\nRegards,\r\nApex Logistics Director",
+
+                    "bodyPreview": "Hi Priya,\r\n\r\nHope you're doing well. I wanted to follow up regarding our Cyber Liability policy (POL-CYB-99281) which is due for renewal...",
+
+                    "receivedDateTime": "2025-12-04T18:46:14Z",
+
+                    "webLink": "https://outlook.live.com/owa/?ItemID=E001",
+
+                    "isUrgent": false
+
+                }
+
+            ],
+
+            "metadata": {
+
+                "sourceSystem": "AMS_Enterprise",
+
+                "sourceUrl": "https://ams.broker-demo.com/policy/99281"
+
+            }
+
+        },
+
+        {
+
+            "id": "WF-1764885241609-932",
+
+            "client": {
+
+                "id": "C-552",
+
+                "name": "Rahul Sharma",
+
+                "email": "rahul.sharma@sharmatraders.in",
+
+                "phone": "-141884",
+
+                "company": "Sharma Traders",
+
+                "accountManager": "Aditi Patel"
+
+            },
+
+            "policies": [
+
+                {
+
+                    "policyNumber": "LIC-GRP-90322",
+
+                    "carrier": "LIC",
+
+                    "type": "Group Health",
+
+                    "expiryDate": "15-01-2026",
+
+                    "premium": 25000,
+
+                    "status": "Active",
+
+                    "claimsCount": 0,
+
+                    "isDueForRenewal": true
+
+                }
+
+            ],
+
+            "emails": [
+
+                {
+
+                    "id": "E004",
+
+                    "subject": "LIC Group Health – Delayed Endorsement",
+
+                    "body": "Hi Aditi,\r\n\r\nOur LIC endorsement request is still pending after 12 days. The employee addition form has been submitted, but we haven't received any acknowledgment. The employee needs the e-card urgently for a medical procedure this week.\r\n\nPlease escalate this issue with LIC or advise an alternative.\r\n\nThanks,\nRahul Sharma",
+
+                    "bodyPreview": "Hi Aditi,\r\n\r\nOur LIC endorsement request is still pending...",
+
+                    "receivedDateTime": "2025-12-02T15:42:10Z",
+
+                    "webLink": "https://outlook.live.com/owa/?ItemID=E004",
+
+                    "isUrgent": false
+
+                }
+
+            ],
+
+            "metadata": {
+
+                "sourceSystem": "Salesforce_CRM",
+
+                "sourceUrl": "https://crm.broker-demo.com/lead/552"
+
+            }
+
+        },
+
+        {
+
+            "id": "WF-1764885241611-621",
+
+            "client": {
+
+                "id": "C-889",
+
+                "name": "Dr. Sarah Jenkins",
+
+                "email": "sarah.j@cityclinic.com",
+
+                "phone": "-177461",
+
+                "company": "City Dental Clinic",
+
+                "accountManager": "Priya Singh"
+
+            },
+
+            "policies": [
+
+                {
+
+                    "policyNumber": "POL-MED-11022",
+
+                    "carrier": "The New India Assurance",
+
+                    "type": "Professional Indemnity",
+
+                    "expiryDate": "01-02-2026",
+
+                    "premium": 12000,
+
+                    "status": "Active",
+
+                    "claimsCount": 0,
+
+                    "isDueForRenewal": true
+
+                }
+
+            ],
+
+            "emails": [
+
+                {
+
+                    "id": "E006",
+
+                    "subject": "Positive Feedback – Professional Indemnity",
+
+                    "body": "Hi Priya,\r\n\r\nJust wanted to appreciate your help with the Professional Indemnity policy (POL-MED-11022). The process was smooth and your guidance regarding coverage limits was very helpful.\r\n\nThanks for always being proactive.\r\n\nBest regards,\nDr. Sarah Jenkins",
+
+                    "bodyPreview": "Hi Priya,\r\n\r\nJust wanted to appreciate your help with the indemnity policy...",
+
+                    "receivedDateTime": "2025-12-01T08:15:22Z",
+
+                    "webLink": "https://outlook.live.com/owa/?ItemID=E006",
+
+                    "isUrgent": false
+
+                },
+
+                {
+
+                    "id": "E010",
+
+                    "subject": "Feedback – Excellent support for Indemnity",
+
+                    "body": "Hi Priya,\r\n\r\nThank you for your prompt support regarding the Professional Indemnity policy POL-MED-11022. Your guidance on coverage and documentation has been invaluable, and the process went very smoothly.\r\n\nBest regards,\nDr. Sarah Jenkins",
+
+                    "bodyPreview": "Hi Priya,\r\n\r\nThank you for your prompt support on our indemnity policy...",
+
+                    "receivedDateTime": "2025-12-02T11:10:05Z",
+
+                    "webLink": "https://outlook.live.com/owa/?ItemID=E010",
+
+                    "isUrgent": false
+
+                }
+
+            ],
+
+            "metadata": {
+
+                "sourceSystem": "AMS_Enterprise",
+
+                "sourceUrl": "https://ams.broker-demo.com/policy/11022"
+
+            }
+
+        },
+
+        {
+
+            "id": "WF-1764885241612-785",
+
+            "client": {
+
+                "id": "C-234",
+
+                "name": "BrightMart Retail Pvt Ltd",
+
+                "email": "accounts@brightmart.in",
+
+                "phone": "-134132",
+
+                "company": "BrightMart Retail",
+
+                "accountManager": "Nisha Rao"
+
+            },
+
+            "policies": [
+
+                {
+
+                    "policyNumber": "POL-FIR-77120",
+
+                    "carrier": "ICICI Lombard",
+
+                    "type": "Fire & Burglary",
+
+                    "expiryDate": "15-01-2026",
+
+                    "premium": 38000,
+
+                    "status": "Active",
+
+                    "claimsCount": 1,
+
+                    "isDueForRenewal": true
+
+                }
+
+            ],
+
+            "emails": [
+
+                {
+
+                    "id": "E007",
+
+                    "subject": "Fire & Burglary – Premium Breakup Request",
+
+                    "body": "Hi,\r\n\r\nWe need a detailed premium breakdown for Fire & Burglary policy POL-FIR-77120. Please include building coverage, stock coverage, burglary add-ons, and GST charges.\r\n\nThanks,\nBrightMart Accounts",
+
+                    "bodyPreview": "Hi,\r\n\r\nWe need a detailed premium breakdown for POL-FIR-77120...",
+
+                    "receivedDateTime": "2025-11-30T14:55:10Z",
+
+                    "webLink": "https://outlook.live.com/owa/?ItemID=E007",
+
+                    "isUrgent": false
+
+                }
+
+            ],
+
+            "metadata": {
+
+                "sourceSystem": "Broker_Pro",
+
+                "sourceUrl": "https://brokerpro.com/policy/77120"
+
+            }
+
+        },
+
+        {
+
+            "id": "WF-1764885241613-568",
+
+            "client": {
+
+                "id": "C-9902",
+
+                "name": "Global Textile Exports",
+
+                "email": "export@globaltextiles.com",
+
+                "phone": "-108556",
+
+                "company": "Global Textile Exports",
+
+                "accountManager": "Rohan Deshmukh"
+
+            },
+
+            "policies": [
+
+                {
+
+                    "policyNumber": "POL-MARINE-22219",
+
+                    "carrier": "Tata AIG",
+
+                    "type": "Marine Transit",
+
+                    "expiryDate": "01-02-2026",
+
+                    "premium": 62000,
+
+                    "status": "Active",
+
+                    "claimsCount": 1,
+
+                    "isDueForRenewal": true
+
+                }
+
+            ],
+
+            "emails": [
+
+                {
+
+                    "id": "E008",
+
+                    "subject": "Marine Shipment Damaged – POL-MARINE-22219",
+
+                    "body": "Hello,\r\n\r\nOur shipment from Surat arrived with water damage and torn packaging. We need to file a claim under POL-MARINE-22219. Please advise on the next steps including surveyor appointment, required documents, and estimated timeline.\r\n\nAttached are photos of the damaged goods.\r\n\nRegards,\nExports Team\nGlobal Textiles",
+
+                    "bodyPreview": "Hello,\r\n\r\nOur shipment arrived damaged and we need to file a claim...",
+
+                    "receivedDateTime": "2025-11-29T16:30:05Z",
+
+                    "webLink": "https://outlook.live.com/owa/?ItemID=E008",
+
+                    "isUrgent": false
+
+                }
+
+            ],
+
+            "metadata": {
+
+                "sourceSystem": "Salesforce_CRM",
+
+                "sourceUrl": "https://crm.broker-demo.com/lead/9902"
+
+            }
+
+        },
+
+        {
+
+            "id": "WF-1764885241619-936",
+
+            "client": {
+
+                "id": "C-66710",
+
+                "name": "OmniTech Software Pvt Ltd",
+
+                "email": "admin@omnitech.in",
+
+                "phone": "-120121",
+
+                "company": "OmniTech Software",
+
+                "accountManager": "Aditi Patel"
+
+            },
+
+            "policies": [
+
+                {
+
+                    "policyNumber": "POL-CYB-66710",
+
+                    "carrier": "Chubb",
+
+                    "type": "Cyber Liability",
+
+                    "expiryDate": "01-11-2025",
+
+                    "premium": 145000,
+
+                    "status": "Active",
+
+                    "claimsCount": 1,
+
+                    "isDueForRenewal": false
+
+                },
+
+                {
+
+                    "policyNumber": "POL-DnO-66710",
+
+                    "carrier": "HDFC ERGO",
+
+                    "type": "Directors & Officers Liability",
+
+                    "expiryDate": "01-04-2026",
+
+                    "premium": 78000,
+
+                    "status": "Active",
+
+                    "claimsCount": 0,
+
+                    "isDueForRenewal": true
+
+                }
+
+            ],
+
+            "emails": [],
+
+            "metadata": {
+
+                "sourceSystem": "AMS_Enterprise",
+
+                "sourceUrl": "https://ams.broker-demo.com/policy/66710"
+
+            }
+
+        }
+
+    ] 

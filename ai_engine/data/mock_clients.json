@@ -1,0 +1,39 @@
+{
+  "clients": [
+    {
+      "client_id": "C-101",
+      "name": "Acme Corp",
+      "premium_amount": 50000,
+      "days_to_expiry": 15,
+      "recent_emails": []
+    },
+    {
+      "client_id": "C-102",
+      "name": "Stark Industries",
+      "premium_amount": 100000,
+      "days_to_expiry": 5,
+      "recent_emails": ["MSG-201", "MSG-202", "MSG-203"]
+    },
+    {
+      "client_id": "C-103",
+      "name": "Wayne Enterprises",
+      "premium_amount": 18000,
+      "days_to_expiry": 60,
+      "recent_emails": []
+    },
+    {
+      "client_id": "C-104",
+      "name": "Oscorp",
+      "premium_amount": 30000,
+      "days_to_expiry": 25,
+      "recent_emails": []
+    },
+    {
+      "client_id": "C-105",
+      "name": "LexCorp",
+      "premium_amount": 50000,
+      "days_to_expiry": 40,
+      "recent_emails": []
+    }
+  ]
+}

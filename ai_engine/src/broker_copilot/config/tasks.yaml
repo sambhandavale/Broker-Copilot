@@ -1,0 +1,76 @@
+scoring_task:
+  description: >
+    Analyze the provided Insurance Data JSON: {raw_data}
+
+    Your goal is to score and rank each client for renewal priority (0-100 scale) and provide actionable sales intelligence.
+    
+    ### SCORING RUBRIC (Total 100pts):
+    1. Premium at Risk (Max 20pts): Higher premium = higher score.
+    2. Time to Expiry (Max 25pts): Expiring < 30 days or LAPSED = max score.
+    3. Sentiment & Churn Risk (Max 20pts): Angry emails, service failures = max score.
+    4. Claims & Past Performance (Max 20pts): Open claims, high frequency = high score.
+    5. Carrier Difficulty (Max 15pts): Carrier delays or hard markets.
+
+    ### CRITICAL DATA INSTRUCTIONS:
+    - **ID MATCHING**: You MUST return the exact 'id' field from the input client object as 'record_id' in your output. Do not generate new IDs.
+    - **REFERENCES**: Every major claim (Risk) or Quote (Email) must be cited in 'key_references' with its 'webLink'.
+
+    ### ANALYSIS INSTRUCTIONS:
+    1. **Reasoning (Executive Summary)**: Write a short, coherent paragraph (2 sentences) summarizing WHY the client has this score. Combine the risk factors and premiums into a narrative.
+    2. **Risk Factors**: Identify specific threats (e.g., "Open Claim (Collision)", "Premium Increase > 10%").
+    3. **Talking Points**: Write 3 conversational bullets the broker can use. 
+       - Bad: "Mention claims."
+       - Good: "I noticed the open claim from Dec 4th is still pending; shall I escalate that?"
+    4. **Upsell**: Look at their industry and current policies. 
+       - If they are a tech firm without Cyber, suggest it.
+       - If they have inventory but no Fire/Burglary, suggest it.
+
+    Sort the final list by Rank (1 = Highest Score).
+
+  expected_output: >
+    A JSON object containing a list of ranked renewal cards with rich analysis including reasoning and talking points.
+  agent: senior_renewal_strategist
+
+brief_generation_task:
+  description: >
+    Generate a "One-Page Renewal Brief" for the specific client data provided: {scored_client_data}
+
+    Your goal is to transform the technical scoring data into a readable narrative for the broker.
+
+    ### BRIEF SECTIONS REQUIRED:
+    1. **Executive Summary**: A 3-sentence overview of the client's current status (Health, Sentiment, Urgency).
+    2. **Financial Snapshot**: Total Premium, Days until next expiry, and carrier mix.
+    3. **Key Signals (The "Why" Section)**: 
+       - List the specific events that drove the score.
+       - **CRITICAL**: For every signal, you MUST cite the 'source_system' and 'source_url'.
+       - Example: "Client sent a positive email regarding claims (Source: Outlook | Link)"
+    4. **Coverage Gap Analysis**: Based on the policies they *have* vs what they *need* (upsell opportunities).
+    5. **Action Plan**: A step-by-step checklist for the broker (e.g., "1. Reply to email E006...", "2. Schedule Zoom call").
+
+  expected_output: >
+    A structured JSON object representing the Renewal Brief, containing source links for every key data point.
+  agent: renewal_brief_specialist
+
+# generate_brief_task:
+#   description: >
+#     Generate a renewal summary comparing current policy vs new quote.
+#     Perform gap analysis, summarize findings as HTML, and suggest actionable recommendations.
+#   expected_output: >
+#     JSON object with 'brief_html' and 'key_changes'.
+#   agent: analyst_agent
+
+# draft_outreach_task:
+#   description: >
+#     Draft a professional outreach email or meeting invitation using provided client info and summary.
+#     Ensure empathetic yet persuasive tone if the client is high-risk.
+#   expected_output: >
+#     JSON with 'subject', 'body_text', and 'attachment_ready' fields.
+#   agent: executor_agent
+
+# ask_copilot_task:
+#   description: >
+#     Respond to insurance-related user questions using only the given context documents.
+#     Return concise factual answers with citation.
+#   expected_output: >
+#     JSON with 'answer' and 'source_citation'.
+#   agent: copilot_agent
