@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Update dashboard UI code",
+			"type": "shell",
+			"command": "echo Updating dashboard UI...",
+			"group": "build"
+		}
+	]
+}
