@@ -1,0 +1,123 @@
+[
+  {
+    "rank": 1,
+    "client_name": "Apex Logistics Ltd",
+    "total_premium": 130000,
+    "score": 95,
+    "status": "Critical",
+    "reasoning": "High premium account ($130k) with imminent expiry (approx. 15 days). Board-level pressure regarding an upcoming IT Audit requires immediate quote turnaround to prevent churn.",
+    "key_references": [
+      {
+        "source_id": "E001",
+        "snippet": "This is time-sensitive as our IT audit is scheduled for next week. Kindly prioritise.",
+        "url": "https://outlook.live.com/owa/?ItemID=E001"
+      },
+      {
+        "source_id": "POL-CYB-99281",
+        "snippet": "Expiry Date: 20-12-2025 (Imminent)",
+        "url": "https://ams.broker-demo.com/policy/99281"
+      }
+    ],
+    "recommended_action": "Prioritize Cyber quote generation immediately, address ransomware sublimits, and confirm audit compliance details with the Director."
+  },
+  {
+    "rank": 2,
+    "client_name": "Sharma Traders",
+    "total_premium": 25000,
+    "score": 88,
+    "status": "Critical",
+    "reasoning": "Severe operational failure detected. Endorsement delayed by 12+ days preventing an urgent medical procedure. High risk of reputational damage and client churn despite lower premium.",
+    "key_references": [
+      {
+        "source_id": "E004",
+        "snippet": "endorsement request is still pending after 12 days... employee needs the e-card urgently for a medical procedure",
+        "url": "https://outlook.live.com/owa/?ItemID=E004"
+      },
+      {
+        "source_id": "LIC-GRP-90322",
+        "snippet": "Carrier: LIC | Type: Group Health",
+        "url": "https://crm.broker-demo.com/lead/552"
+      }
+    ],
+    "recommended_action": "Immediately escalate with LIC relationship manager to generate the e-card manually and call the client to apologize."
+  },
+  {
+    "rank": 3,
+    "client_name": "Global Textile Exports",
+    "total_premium": 62000,
+    "score": 72,
+    "status": "High",
+    "reasoning": "Active claim scenario (Marine Transit). Shipment arrived with water damage. While renewal is in Feb 2026, claims handling is a 'moment of truth' that dictates retention.",
+    "key_references": [
+      {
+        "source_id": "E008",
+        "snippet": "Shipment from Surat arrived with water damage... need to file a claim under POL-MARINE-22219",
+        "url": "https://outlook.live.com/owa/?ItemID=E008"
+      },
+      {
+        "source_id": "POL-MARINE-22219",
+        "snippet": "Status: Active | Claims Count: 1",
+        "url": "https://crm.broker-demo.com/lead/9902"
+      }
+    ],
+    "recommended_action": "Initiate claim process, appoint a surveyor immediately, and send a 'Claim Steps' guide to the client."
+  },
+  {
+    "rank": 4,
+    "client_name": "BrightMart Retail Pvt Ltd",
+    "total_premium": 38000,
+    "score": 55,
+    "status": "Medium",
+    "reasoning": "Standard administrative request for premium breakdown (GST/Add-ons). Policy due in Jan 2026. No negative sentiment or immediate risk detected.",
+    "key_references": [
+      {
+        "source_id": "E007",
+        "snippet": "We need a detailed premium breakdown... include building coverage, stock coverage, burglary add-ons",
+        "url": "https://outlook.live.com/owa/?ItemID=E007"
+      },
+      {
+        "source_id": "POL-FIR-77120",
+        "snippet": "Expiry Date: 15-01-2026",
+        "url": "https://brokerpro.com/policy/77120"
+      }
+    ],
+    "recommended_action": "Generate the premium breakdown document and email it to the accounts team by end of day."
+  },
+  {
+    "rank": 5,
+    "client_name": "OmniTech Software Pvt Ltd",
+    "total_premium": 223000,
+    "score": 30,
+    "status": "Low",
+    "reasoning": "High-value client ($223k) but low urgency. Cyber policy recently renewed (Nov 2025) and DnO policy not due until April 2026. No active inquiries.",
+    "key_references": [
+      {
+        "source_id": "POL-DnO-66710",
+        "snippet": "Expiry Date: 01-04-2026 (4 Months Remaining)",
+        "url": "https://ams.broker-demo.com/policy/66710"
+      }
+    ],
+    "recommended_action": "No immediate action required. Schedule a touchpoint in February 2026 for DnO renewal discussions."
+  },
+  {
+    "rank": 6,
+    "client_name": "Dr. Sarah Jenkins",
+    "total_premium": 12000,
+    "score": 15,
+    "status": "Safe",
+    "reasoning": "Client is highly satisfied. Positive feedback received regarding Professional Indemnity renewal. Extremely low churn risk.",
+    "key_references": [
+      {
+        "source_id": "E006",
+        "snippet": "Just wanted to appreciate your help... The process was smooth",
+        "url": "https://outlook.live.com/owa/?ItemID=E006"
+      },
+      {
+        "source_id": "E010",
+        "snippet": "Feedback – Excellent support for Indemnity",
+        "url": "https://outlook.live.com/owa/?ItemID=E010"
+      }
+    ],
+    "recommended_action": "Send a brief 'Thank You' acknowledgment to maintain the relationship."
+  }
+]
