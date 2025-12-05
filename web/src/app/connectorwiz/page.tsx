@@ -22,6 +22,7 @@ import { Logo } from '@/components/shared/logo';    // Assuming these exist in y
 import { getAction, patchAction } from '@/lib/utils/apiRequests'; // Importing your util functions
 import { useRouter, useSearchParams } from 'next/navigation';
 import Papa from 'papaparse';
+import { PipelineLoader } from './components/PipelineAnimation';
 
 const ConnectPage = () => {
   const [activeTab, setActiveTab] = useState('broker');
@@ -51,8 +52,7 @@ const ConnectPage = () => {
     "Connecting to Outlook...",
     "Fetching Client Emails...",
     "AI Agent: Analyzing Sentiment...",
-    "AI Agent: Generating Renewal Briefs...",
-    "Finalizing Pipeline..."
+    "Finalizing Pipeline...",
   ];
 
   useEffect(() => {
@@ -111,13 +111,18 @@ const ConnectPage = () => {
     setIsAnalyzing(true);
     setAnalysisStep(0);
 
-    // Simulated Progress Loop (Replace with real progress if using websockets)
+    // 1. Start the fake progress
     const interval = setInterval(() => {
-      setAnalysisStep(prev => (prev < processingSteps.length - 1 ? prev + 1 : prev));
-    }, 1500);
+      setAnalysisStep(prev => {
+        // STOP at the second-to-last step (Wait for API)
+        if (prev >= processingSteps.length - 2) {
+          return prev; 
+        }
+        return prev + 1;
+      });
+    }, 2000); // Slower, more realistic pace
 
     try {
-      // THE REAL API CALL
       const response = await fetch('/api/pipeline/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,15 +134,16 @@ const ConnectPage = () => {
 
       if (!response.ok) throw new Error("Analysis failed");
 
-      console.log(response);
-
-      // On Success
+      // 2. API Success! Now finish the progress bar
       clearInterval(interval);
-      setAnalysisStep(processingSteps.length - 1);
       
+      // Quickly animate through any remaining steps to the end
+      setAnalysisStep(processingSteps.length - 1); 
+      
+      // 3. Redirect after showing the "Success" state for a moment
       setTimeout(() => {
         router.push('/dashboard');
-      }, 1000);
+      }, 1500);
 
     } catch (error) {
       console.error(error);
@@ -375,7 +381,8 @@ const ConnectPage = () => {
             </div>
           </div>
         );
-      default: return null;
+      
+        default: return null;
     }
   };
 
@@ -385,14 +392,11 @@ const ConnectPage = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-gray-900">
       
       {/* --- OVERLAY LOADER --- */}
-      {isAnalyzing && (
+      {/* {isAnalyzing && (
         <div className="fixed inset-0 z-50 bg-white/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-300">
           <div className="relative mb-8">
-            {/* Outer Ring */}
             <div className="w-24 h-24 rounded-full border-4 border-indigo-100 animate-pulse"></div>
-            {/* Spinning Ring */}
             <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
-            {/* Icon */}
             <div className="absolute inset-0 flex items-center justify-center text-indigo-600">
               <BrainCircuit size={32} />
             </div>
@@ -412,6 +416,12 @@ const ConnectPage = () => {
             ))}
           </div>
         </div>
+      )} */}
+      {isAnalyzing && (
+        <PipelineLoader 
+            currentStep={analysisStep} 
+            steps={processingSteps} 
+        />
       )}
 
       {/* --- MAIN MODAL --- */}

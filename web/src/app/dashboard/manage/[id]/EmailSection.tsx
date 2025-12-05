@@ -10,11 +10,21 @@ import emailTemplateData from "@/lib/utils/data/email-template.json";
 
 interface EmailSectionProps {
   clientName: string;
+  // Added optional props to accept AI draft data
+  initialSubject?: string;
+  initialBody?: string;
 }
 
-export default function EmailSection({ clientName }: EmailSectionProps) {
-  const [subject, setSubject] = useState(emailTemplateData.subject_line);
-  const [body, setBody] = useState(emailTemplateData.email_body);
+export default function EmailSection({ 
+  clientName, 
+  initialSubject = emailTemplateData.subject_line, // Default to JSON if no prop provided
+  initialBody = emailTemplateData.email_body       // Default to JSON if no prop provided
+}: EmailSectionProps) {
+  
+  // Initialize state with the passed props
+  const [subject, setSubject] = useState(initialSubject);
+  const [body, setBody] = useState(initialBody);
+  
   const [recipientEmail, setRecipientEmail] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState<{
@@ -27,23 +37,27 @@ export default function EmailSection({ clientName }: EmailSectionProps) {
       setMessage({ type: "error", text: "Please fill in all fields" });
       return;
     }
-    const outlookDomains = [
-      "outlook.com",
-      "hotmail.com",
-      "live.com",
-      "msn.com",
-    ];
-    const emailDomain = recipientEmail.toLowerCase().split("@")[1];
-    if (!outlookDomains.includes(emailDomain)) {
-      setMessage({
-        type: "error",
-        text: "Only Outlook/Hotmail/Live email addresses are allowed",
-      });
-      return;
-    }
+    // const outlookDomains = [
+    //   "outlook.com",
+    //   "hotmail.com",
+    //   "live.com",
+    //   "msn.com",
+    // ];
+    
+    // Safety check for domain (optional - remove if you want to allow all emails)
+    // const emailDomain = recipientEmail.toLowerCase().split("@")[1];
+    // if (!outlookDomains.includes(emailDomain)) {
+    //   setMessage({
+    //     type: "error",
+    //     text: "Only Outlook/Hotmail/Live email addresses are allowed",
+    //   });
+    //   return;
+    // }
 
     setIsSending(true);
     setMessage(null);
+
+    const formattedBody = body.replace(/\n/g, '<br />');
 
     try {
       const response = await fetch("/api/outlook/emails/send", {
@@ -54,7 +68,7 @@ export default function EmailSection({ clientName }: EmailSectionProps) {
         body: JSON.stringify({
           to: recipientEmail,
           subject,
-          body,
+          body: formattedBody,
         }),
       });
 
@@ -80,14 +94,16 @@ export default function EmailSection({ clientName }: EmailSectionProps) {
   };
 
   return (
-    <Card className="bg-white shadow-lg border border-slate-100 rounded-2xl">
-      <CardHeader className="bg-slate-50 border-b border-slate-100">
+    <Card className="bg-white shadow-lg border border-slate-100 rounded-2xl h-full flex flex-col">
+      <CardHeader className="border-b border-slate-100 shrink-0 pt-4">
         <CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <Mail className="h-5 w-5" />
           Send Email to {clientName}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6 space-y-4">
+      
+      {/* Added flex-1 and overflow-y-auto to handle scrolling if content is long */}
+      <CardContent className="px-6 pb-6 space-y-4 flex-1 overflow-y-auto">
         <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-xs text-blue-800 font-semibold mb-1">
             Template Used
@@ -112,9 +128,9 @@ export default function EmailSection({ clientName }: EmailSectionProps) {
             onChange={(e) => setRecipientEmail(e.target.value)}
             className="w-full"
           />
-          <p className="text-xs text-slate-500 mt-1">
+          {/* <p className="text-xs text-slate-500 mt-1">
             Only Outlook, Hotmail, Live, or MSN email addresses
-          </p>
+          </p> */}
         </div>
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">

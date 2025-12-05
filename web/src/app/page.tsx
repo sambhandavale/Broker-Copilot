@@ -20,8 +20,10 @@ import { Footer } from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FeaturesGrid } from "@/components/ui/features";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session } = useSession();
   return (
     <div className="min-h-screen bg-white text-slate-900 relative overflow-hidden">
 
@@ -67,14 +69,15 @@ export default function Home() {
                     <ArrowRight className="w-5 h-5" />
                   </a>
                 </Button>
-
-                <Button
-                  asChild
-                  variant="outline"
-                  className="px-10 py-6 text-lg border-2 hover:bg-indigo-50"
-                >
-                  <a href="/dashboard">View dashboard</a>
-                </Button>
+                {session && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="px-10 py-6 text-lg border-2 hover:bg-indigo-50"
+                  >
+                    <a href="/dashboard">View dashboard</a>
+                  </Button>
+                )}
 
               </div>
 

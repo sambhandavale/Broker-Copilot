@@ -17,7 +17,8 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
-  MoreHorizontal
+  MoreHorizontal,
+  BrainCircuit
 } from 'lucide-react';
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
@@ -28,6 +29,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { getAction, postAction } from '@/lib/utils/apiRequests';
+import { redirect, useRouter } from 'next/navigation';
+import { ActionPlanLoader } from './components/RenewalBriefAnimation';
 
 // --- Interfaces ---
 interface KeyReference { source_id: string; snippet: string; url: string; }
@@ -38,17 +42,38 @@ interface RenewalAnalysis {
     recommendedAction: string; keyReferences: KeyReference[]; analyzedAt: string;
 }
 interface RenewalItem {
-    _id: string; brokerId: string; clientId: string; clientName: string;
-    email: string; company: string; totalPremium: number; aiAnalysis: RenewalAnalysis;
+    _id: string; 
+    brokerId: string; 
+    clientId: string; 
+    clientName: string;
+    email: string; 
+    company: string; 
+    totalPremium: number; 
+    aiAnalysis: RenewalAnalysis;
+    hasDetail:boolean;
 }
 interface DashboardStats { total: number; critical: number; high: number; premiumAtRisk: number; }
 
+const processingSteps = [
+    "Analyzing Risk Profile...",      // Phase: analyze
+    "Generating Renewal Brief...",    // Phase: brief
+    "Drafting Outreach Email...",     // Phase: email
+    "Checking Calendar Availability...", // Phase: calendar
+    "Finalizing Action Package",       // Phase: complete
+    "Generating Renewal Brief...",
+];
+
 const Dashboard = () => {
+    const router = useRouter();
     const [data, setData] = useState<RenewalItem[]>([]);
     const [stats, setStats] = useState<DashboardStats>({ total: 0, critical: 0, high: 0, premiumAtRisk: 0 });
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    
+    // --- New State for Overlay ---
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analysisStep, setAnalysisStep] = useState(0);
     
     // Track expanded rows by ID
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -56,14 +81,65 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch('/api/dashboard/renewals');
-                const json = await res.json();
-                if (json.success) { setData(json.data); setStats(json.stats); }
-            } catch (error) { console.error("Failed to fetch dashboard data:", error); } 
-            finally { setLoading(false); }
+                const json = await getAction('/api/dashboard/renewals');
+
+                if (json.success) {
+                    setData(json.data);
+                    setStats(json.stats);
+                }
+            } catch (error) {
+                console.error("Failed to fetch dashboard data:", error);
+            } finally {
+                setLoading(false);
+            }
         };
+
         fetchData();
     }, []);
+
+    const requestBrief = async (renewalId: string) => {
+        // 1. Start Loading State
+        setIsAnalyzing(true);
+        setAnalysisStep(0);
+
+        // 2. Cycle through steps but PAUSE before the end
+        // We stop at (length - 2) which is "Checking Calendar Availability"
+        // We do NOT show "Finalizing Action Package" (Complete Phase) until API returns.
+        const stepInterval = setInterval(() => {
+            setAnalysisStep((prev) => {
+                if (prev >= processingSteps.length - 2) {
+                    return prev; // Pause here
+                }
+                return prev + 1;
+            });
+        }, 2500);
+
+        try {
+            const res = await postAction('/api/pipeline/generate-brief', { renewalId });
+            
+            if (res.success && res.redirectUrl) {
+                // 3. API Success: Jump to "Finalizing" (Complete Phase)
+                clearInterval(stepInterval);
+                setAnalysisStep(processingSteps.length - 1);
+
+                // 4. Short delay to let the user see the "Success" animation
+                setTimeout(() => {
+                    router.push(res.redirectUrl);
+                    // Optional: Keep loader visible until navigation completes
+                    // setIsAnalyzing(false); 
+                }, 1000);
+            } else {
+                // Handle logical failure
+                clearInterval(stepInterval);
+                setIsAnalyzing(false);
+                console.error("API returned failure");
+            }
+        } catch (error) {
+            console.error("Failed to fetch brief data:", error);
+            clearInterval(stepInterval);
+            setIsAnalyzing(false);
+        }
+    };
 
     const toggleRow = (id: string) => {
         const newExpanded = new Set(expandedRows);
@@ -99,13 +175,13 @@ const Dashboard = () => {
         <div className="min-h-screen bg-white text-slate-900 font-sans">
             <Navbar />
             
-            <main className="pt-24 pb-16">
+            <main className="pt-8 pb-16">
                 <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
                 
-                <div className="max-w-7xl mx-auto px-6"> {/* Increased max-width slightly */}
+                <div className="max-w-7xl mx-auto px-6"> 
                     <div className="mb-8">
                         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-2">
-                            Client Priority Dashboard
+                            Priority Dashboard
                         </h1>
                         <p className="text-lg text-slate-600">
                             AI-driven renewal prioritization and risk analysis.
@@ -248,11 +324,11 @@ const Dashboard = () => {
                                                                 <div className="space-y-4 min-w-0">
                                                                 <div className="min-w-0">
                                                                     <h4 className="text-xs font-bold uppercase text-slate-400 mb-2">
-                                                                    AI Executive Summary
+                                                                        AI Executive Summary
                                                                     </h4>
 
                                                                     <p className="text-sm text-slate-700 leading-relaxed bg-white p-3 rounded-lg border border-slate-200 break-words whitespace-normal">
-                                                                    {item.aiAnalysis.reasoning}
+                                                                        {item.aiAnalysis.reasoning}
                                                                     </p>
                                                                 </div>
 
@@ -273,13 +349,20 @@ const Dashboard = () => {
 
                                                                 <div className="space-y-4">
                                                                     {item.aiAnalysis.upsell_opportunity && (
-                                                                        <div className="flex items-start gap-3 bg-purple-50 p-3 rounded-lg border border-purple-100">
-                                                                            <Sparkles className="h-5 w-5 text-purple-600 mt-0.5 shrink-0" />
-                                                                            <div className="min-w-0"> {/* Ensure flex child shrinks */}
-                                                                                <div className="text-xs font-bold text-purple-700 uppercase">Upsell Opportunity</div>
-                                                                                <div className="text-sm text-purple-900 mt-1 break-words">{item.aiAnalysis.upsell_opportunity}</div>
+                                                                    <div className="flex items-start gap-3 bg-purple-50 p-3 rounded-lg border border-purple-100 min-w-0">
+                                                                        <Sparkles className="h-5 w-5 text-purple-600 mt-0.5 shrink-0" />
+
+                                                                        <div className="min-w-0">
+                                                                            <div className="text-xs font-bold text-purple-700 uppercase">
+                                                                                Upsell Opportunity
+                                                                            </div>
+
+                                                                            <div className="text-sm text-purple-900 mt-1 break-words whitespace-normal min-w-0">
+                                                                                {item.aiAnalysis.upsell_opportunity}
                                                                             </div>
                                                                         </div>
+                                                                    </div>
+
                                                                     )}
 
                                                                     <div className="min-w-0">
@@ -294,7 +377,7 @@ const Dashboard = () => {
 
                                                                             {/* FIX: wrapping enabled with whitespace-normal + min-w-0 */}
                                                                             <span className="italic break-words whitespace-normal min-w-0">
-                                                                            {`"${point}"`}
+                                                                                {`"${point}"`}
                                                                             </span>
                                                                         </li>
                                                                         ))}
@@ -303,8 +386,12 @@ const Dashboard = () => {
 
                                                                     
                                                                     <div className="pt-2 flex gap-2">
-                                                                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                                                                            Use This Script
+                                                                        <Button 
+                                                                            size="sm" 
+                                                                            className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                                                                            onClick={()=>item.hasDetail ? redirect(`/dashboard/renewals/${item._id}`) : requestBrief(item._id)}
+                                                                        >
+                                                                            {item.hasDetail ? 'View Brief' : 'Take Action'} 
                                                                         </Button>
                                                                     </div>
                                                                 </div>
@@ -322,6 +409,14 @@ const Dashboard = () => {
                 </div>
             </main>
             <Footer />
+
+            {/* --- AI PROCESSING OVERLAY --- */}
+            {isAnalyzing && (
+                <ActionPlanLoader
+                    currentStep={analysisStep}
+                    steps={processingSteps}
+                />
+            )}
         </div>
     );
 }

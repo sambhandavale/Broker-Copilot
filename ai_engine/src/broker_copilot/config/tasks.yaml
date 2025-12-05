@@ -33,24 +33,74 @@ scoring_task:
 
 brief_generation_task:
   description: >
-    Generate a "One-Page Renewal Brief" for the specific client data provided: {scored_client_data}
+    Generate a "One-Page Renewal Brief" based on the specific client data provided below.
+
+    {scoring_data}
 
     Your goal is to transform the technical scoring data into a readable narrative for the broker.
 
+    ### DATA SOURCE RULES (CRITICAL):
+    1. **Emails**: Cite "Outlook" if a URL is present.
+    2. **Policy/Claims Data**: You MUST cite the 'csvLocation' field provided in the policy data.
+       - Example: "High claims activity (Source: Excel Row 2 - ID: POL-99281)"
+    3. **Risk Analysis**: Cite "AI Analysis".
+
+    ### DECISION LOGIC (MEETING VS. EMAIL):
+    Analyze the Client Health, Sentiment, and Complexity to decide the "Primary Action":
+    - **IF** Risk is 'High' OR Sentiment is 'Negative' OR Claims > 0:
+      - The Primary Action MUST be: "Schedule Urgent Review Meeting".
+    - **IF** there is a Complex Upsell (e.g., D&O, Cyber gap):
+      - The Primary Action MUST be: "Schedule Consultative Call".
+    - **IF** Risk is 'Low' AND Sentiment is 'Positive' (Happy Path):
+      - The Primary Action MUST be: "Send Renewal Terms via Email" (No meeting required unless requested).
+
+    ### 4. GAP ANALYSIS & UPSELL RULES (MANDATORY):
+    Check the client's 'industry' and 'current_policies'. You MUST identify at least one coverage gap using this logic:
+    - **IF Tech/SaaS** AND No Cyber Liability -> Suggest: "Cyber Liability (Data Breach Protection)"
+    - **IF Retail/Inventory** AND No Property/Theft -> Suggest: "Commercial Property (Theft & Spoilage)"
+    - **IF Construction/Services** AND No Professional Liability -> Suggest: "E&O / Professional Liability"
+    - **IF High Revenue (>$5M)** AND No D&O -> Suggest: "Directors & Officers (D&O) Insurance"
+    - **IF General Fallback**: Suggest "Umbrella / Excess Liability" to increase limits.
+
     ### BRIEF SECTIONS REQUIRED:
-    1. **Executive Summary**: A 3-sentence overview of the client's current status (Health, Sentiment, Urgency).
+    1. **Executive Summary**: A 3-sentence overview including your decision on the meeting strategy.
     2. **Financial Snapshot**: Total Premium, Days until next expiry, and carrier mix.
-    3. **Key Signals (The "Why" Section)**: 
-       - List the specific events that drove the score.
-       - **CRITICAL**: For every signal, you MUST cite the 'source_system' and 'source_url'.
-       - Example: "Client sent a positive email regarding claims (Source: Outlook | Link)"
-    4. **Coverage Gap Analysis**: Based on the policies they *have* vs what they *need* (upsell opportunities).
-    5. **Action Plan**: A step-by-step checklist for the broker (e.g., "1. Reply to email E006...", "2. Schedule Zoom call").
+    3. **Key Signals**: List events driving the score with specific CITATIONS (Source & Link).
+    4. **Coverage Gap Analysis**: Upsell opportunities.
+    5. **Action Plan**: A step-by-step checklist.
+       - **CRITICAL**: Step 1 must match your "Primary Action" decision above.
+       - Example (High Risk): "1. Schedule Zoom call to discuss claims..."
+       - Example (Low Risk): "1. Email renewal terms attached..."
 
   expected_output: >
     A structured JSON object representing the Renewal Brief, containing source links for every key data point.
   agent: renewal_brief_specialist
 
+email_drafting_task:
+  description: >
+    Take the Renewal Briefs from the previous task.
+    
+    Using the original client data for reference:
+    {scoring_data}
+
+    For each client, draft an outreach email.
+
+    ### STRATEGY ALIGNMENT:
+    Look at the 'Action Plan' generated in the Brief.
+    - If the Brief says **"Schedule Meeting"**: Your email MUST propose 2 specific timeslots and emphasize the need for a conversation.
+    - If the Brief says **"Send Renewal Terms"**: Your email should attach the terms (placeholder) and ask for confirmation/signature, with a meeting only as an optional footer.
+
+    ### TEMPLATE LOGIC:
+    1. **Rescue Mission** (High Risk/Claims): Subject line must include "Urgent" or "Action Required". Tone is professional and concerned. Call to Action (CTA) is a Meeting.
+    2. **Upsell** (Gap Identified): Subject line focuses on "Protection" or "Strategy". Tone is consultative. CTA is a Meeting or Call.
+    3. **Happy Path** (Low Risk): Subject line is "Renewal Terms Enclosed". Tone is warm and efficient. CTA is Signature/Approval.
+
+    Combine the Score, the Brief, and the Draft into a final package for each client.
+  expected_output: >
+    A FinalAgentOutput object containing a list of ClientPackages.
+  agent: client_communication_specialist
+
+  
 # generate_brief_task:
 #   description: >
 #     Generate a renewal summary comparing current policy vs new quote.

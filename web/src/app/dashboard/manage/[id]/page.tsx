@@ -69,7 +69,7 @@ async function getClientData(id: string): Promise<DashboardItem | null> {
 async function getClientDetailData(): Promise<ClientDetailData> {
   const jsonFilePath = path.join(
     process.cwd(),
-    "src/lib/utils/data/client-data.json"
+    "src/lib/utils/data/client-data.json" 
   );
   const jsonData = await fs.readFile(jsonFilePath, "utf8");
   return JSON.parse(jsonData);

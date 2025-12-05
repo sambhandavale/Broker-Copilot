@@ -1,4 +1,4 @@
-async function apiRequest<T>(url: string, method: string, body?: any, timeout: number = 10000): Promise<T> {
+async function apiRequest<T>(url: string, method: string, body?: any, timeout: number = 50000): Promise<T> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
 
@@ -35,34 +35,34 @@ async function apiRequest<T>(url: string, method: string, body?: any, timeout: n
 /**
  * Generic POST request wrapper
  */
-export async function postAction<T = any>(url: string, body: any, timeout: number = 10000): Promise<T> {
+export async function postAction<T = any>(url: string, body: any, timeout: number = 50000): Promise<T> {
   return apiRequest<T>(url, "POST", body, timeout);
 }
 
 /**
  * Generic PATCH request wrapper
  */
-export async function patchAction<T = any>(url: string, body: any, timeout: number = 10000): Promise<T> {
+export async function patchAction<T = any>(url: string, body: any, timeout: number = 50000): Promise<T> {
   return apiRequest<T>(url, "PATCH", body, timeout);
 }
 
 /**
  * Generic PUT request wrapper
  */
-export async function putAction<T = any>(url: string, body: any, timeout: number = 10000): Promise<T> {
+export async function putAction<T = any>(url: string, body: any, timeout: number = 50000): Promise<T> {
   return apiRequest<T>(url, "PUT", body, timeout);
 }
 
 /**
  * Generic GET request wrapper
  */
-export async function getAction<T = any>(url: string, timeout: number = 10000): Promise<T> {
+export async function getAction<T = any>(url: string, timeout: number = 50000): Promise<T> {
   return apiRequest<T>(url, "GET", undefined, timeout);
 }
 
 /**
  * Generic DELETE request wrapper
  */
-export async function deleteAction<T = any>(url: string, timeout: number = 10000): Promise<T> {
+export async function deleteAction<T = any>(url: string, timeout: number = 50000): Promise<T> {
   return apiRequest<T>(url, "DELETE", undefined, timeout);
 }
