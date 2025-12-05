@@ -1,4 +1,40 @@
-export const MOCK_EMAILS: Record<string, any[]> = {
+interface EmailAttachment {
+  "@odata.type": string;
+  "@odata.mediaContentType": string;
+  id: string;
+  name: string;
+  contentType: string;
+  size: number;
+  isInline: boolean;
+}
+
+interface EmailAddress {
+  name: string;
+  address: string;
+}
+
+interface EmailBody {
+  contentType: string;
+  content: string;
+}
+
+interface Email {
+  "@odata.etag": string;
+  id: string;
+  receivedDateTime: string;
+  hasAttachments: boolean;
+  subject: string;
+  bodyPreview: string;
+  isRead: boolean;
+  webLink: string;
+  body: EmailBody;
+  from: {
+    emailAddress: EmailAddress;
+  };
+  attachments: EmailAttachment[];
+}
+
+export const MOCK_EMAILS: Record<string, Email[]> = {
   "director@apexlogistics.com": [
     {
       "@odata.etag": "W/\"CQAAABYAAACxOnPVRVxOTpiBmDr5qfpLAAdLFgtF\"",

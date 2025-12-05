@@ -1,0 +1,66 @@
+{
+  "client_id": "C-889",
+  "client_name": "Dr. Sarah Jenkins",
+  "brief_generated_at": "2025-12-05T14:00:00Z",
+  "executive_summary": "Dr. Jenkins is a low-risk, highly satisfied client with a Professional Indemnity policy expiring in Feb 2026. Recent sentiment analysis indicates a strong relationship due to smooth claims processing. The account is stable, but early engagement is recommended to maintain rapport.",
+
+  "financial_snapshot": {
+    "total_annual_premium": 12000,
+    "primary_carrier": "The New India Assurance",
+    "days_to_expiry": 58,
+    "renewal_urgency": "Low"
+  },
+
+  "key_signals": [
+    {
+      "signal_type": "Sentiment",
+      "description": "Client expressed appreciation for smooth process and guidance on coverage limits.",
+      "source_system": "Outlook (Email)",
+      "source_reference": "E006",
+      "source_link": "https://outlook.live.com/owa/?ItemID=E006",
+      "impact": "Positive"
+    },
+    {
+      "signal_type": "Engagement",
+      "description": "Follow-up email confirming prompt support and valuable documentation guidance.",
+      "source_system": "Outlook (Email)",
+      "source_reference": "E010",
+      "source_link": "https://outlook.live.com/owa/?ItemID=E010",
+      "impact": "Positive"
+    },
+    {
+      "signal_type": "Policy Status",
+      "description": "Professional Indemnity policy is Active with 0 claims.",
+      "source_system": "AMS (Agency Management System)",
+      "source_reference": "POL-MED-11022",
+      "source_link": "https://ams.broker-demo.com/policy/11022",
+      "impact": "Neutral"
+    }
+  ],
+
+  "coverage_gap_analysis": {
+    "current_coverage": ["Professional Indemnity"],
+    "identified_gaps": [
+      "Cyber Liability (Medical records protection)",
+      "Commercial General Liability (Clinic premises)"
+    ],
+    "upsell_talking_point": "Since you handle sensitive patient data, have you considered Cyber Liability coverage to protect against data breaches?"
+  },
+
+  "action_plan": {
+    "suggested_actions": [
+      {
+        "step": 1,
+        "action": "Acknowledge Positive Feedback",
+        "detail": "Reply to Email E010 thanking her for the kind words.",
+        "tool_link": "https://outlook.live.com/owa/?ItemID=E010"
+      },
+      {
+        "step": 2,
+        "action": "Schedule Renewal Review",
+        "detail": "Set up a meeting for mid-January to discuss renewal and potential Cyber coverage.",
+        "tool_link": "https://calendar.google.com/event?create=new"
+      }
+    ]
+  }
+}
