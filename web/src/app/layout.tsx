@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import "./fonts.css";
 
 import "./globals.css";
 import { NextAuthProvider } from "@/providers/authProvider";
@@ -19,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.style} antialiased`}
+        className={`${inter.style} antialiased font-google`}
       >
         <NextAuthProvider>
           {children}

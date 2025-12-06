@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import { CalendarDays, CheckCircle2, Mail, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 
 export function OutlookIntegrationSection() {
+  const { data: session } = useSession();
   return (
     <section className="py-20 px-6 bg-slate-50">
       <div className="max-w-7xl mx-auto">
@@ -42,7 +44,7 @@ export function OutlookIntegrationSection() {
             </div>
             <div className="mt-8">
               <Button asChild>
-                <a href="/connectorwiz">Connect Microsoft</a>
+                <a href={session ? "/connectorwiz": "/auth"}>Connect Microsoft</a>
               </Button>
             </div>
           </motion.div>

@@ -74,7 +74,7 @@ export function HeroSection() {
               </a>
             </Button>
             
-            <Button
+            {/* <Button
               asChild
               variant="outline"
               className="px-8 py-4 text-base border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all duration-200"
@@ -85,7 +85,7 @@ export function HeroSection() {
                   <div className="w-0 h-0 border-l-[6px] border-l-white border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-0.5"></div>
                 </span>
               </a>
-            </Button>
+            </Button> */}
 
             {session && (
               <Button

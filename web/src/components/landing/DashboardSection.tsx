@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import { BarChart3, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 
 export function DashboardSection() {
+  const { data: session } = useSession();
   return (
     <section className="py-20 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -102,7 +104,7 @@ export function DashboardSection() {
             </div>
             <div className="mt-8">
               <Button asChild variant="outline" className="mr-4">
-                <a href="/dashboard">View Dashboard</a>
+                <a href={session ? "/dashboard" : '/auth'}>View Dashboard</a>
               </Button>
               <Button asChild>
                 <a href="/auth">Get Started</a>
