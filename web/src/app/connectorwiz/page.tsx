@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { 
   Building2, 
   Upload, 
@@ -17,14 +17,15 @@ import {
   Play,
   BrainCircuit
 } from 'lucide-react';
-import { NavButton } from './components/NavButton'; // Assuming these exist in your project
-import { Logo } from '@/components/shared/logo';    // Assuming these exist in your project
-import { getAction, patchAction } from '@/lib/utils/apiRequests'; // Importing your util functions
+import { NavButton } from './components/NavButton'; 
+import { Logo } from '@/components/shared/logo';    
+import { getAction, patchAction } from '@/lib/utils/apiRequests'; 
 import { useRouter, useSearchParams } from 'next/navigation';
 import Papa from 'papaparse';
 import { PipelineLoader } from './components/PipelineAnimation';
 
-const ConnectPage = () => {
+// 1. Move all the main logic into this Content component
+const ConnectPageContent = () => {
   const [activeTab, setActiveTab] = useState('broker');
   const [loading, setLoading] = useState<string | null>(null);
   
@@ -69,8 +70,7 @@ const ConnectPage = () => {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-
-        const res = await getAction('/api/users/me');
+        const res = await getAction<any>('/api/users/me'); // added generic type or remove if strict
         if (res.user.microsoft?.tokenExpiresAt) setConnections(prev => ({ ...prev, outlook: true }));
         if (res.user.settings?.renewalWindowDays) setRenewalDays(res.user.settings.renewalWindowDays);
       } catch (error) {
@@ -391,32 +391,6 @@ const ConnectPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-gray-900">
       
-      {/* --- OVERLAY LOADER --- */}
-      {/* {isAnalyzing && (
-        <div className="fixed inset-0 z-50 bg-white/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-300">
-          <div className="relative mb-8">
-            <div className="w-24 h-24 rounded-full border-4 border-indigo-100 animate-pulse"></div>
-            <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
-            <div className="absolute inset-0 flex items-center justify-center text-indigo-600">
-              <BrainCircuit size={32} />
-            </div>
-          </div>
-          
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Building Your Pipeline</h2>
-          <p className="text-indigo-600 font-medium animate-pulse">
-             {processingSteps[analysisStep]}
-          </p>
-          
-          <div className="mt-8 flex gap-2">
-            {processingSteps.map((_, i) => (
-              <div 
-                key={i} 
-                className={`w-2 h-2 rounded-full transition-colors duration-300 ${i <= analysisStep ? 'bg-indigo-600' : 'bg-gray-200'}`} 
-              />
-            ))}
-          </div>
-        </div>
-      )} */}
       {isAnalyzing && (
         <PipelineLoader 
             currentStep={analysisStep} 
@@ -495,4 +469,15 @@ const ConnectPage = () => {
   );
 };
 
-export default ConnectPage;
+// 2. The Main Page Component wraps the content in Suspense
+export default function ConnectPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="animate-spin text-indigo-600" size={32} />
+      </div>
+    }>
+      <ConnectPageContent />
+    </Suspense>
+  );
+}

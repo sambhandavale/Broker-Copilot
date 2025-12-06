@@ -18,7 +18,7 @@ export const Navbar = () => {
           <Shield className="w-5 h-5" />
         </div>
         <span className="text-xl font-bold text-slate-900 tracking-tight">
-          BrokerFlow
+          Broker Copilot
         </span>
       </a>
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { postAction } from "@/lib/utils/apiRequests";
 import { Logo } from "@/components/shared/logo";
 
-export default function AuthPage() {
+// 1. We move the Logic into a separate component
+function AuthContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -208,5 +209,21 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 2. The Main Page Component wraps the content in Suspense
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-8 w-8 bg-blue-600 rounded-lg mb-4"></div>
+          <p className="text-slate-400 text-sm">Loading...</p>
+        </div>
+      </div>
+    }>
+      <AuthContent />
+    </Suspense>
   );
 }
