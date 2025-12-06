@@ -34,10 +34,10 @@ Broker Copilot simplifies the policy renewal process for insurance brokers by:
 - LLM integration for policy analysis and email drafting
 
 **Database**
-- PostgreSQL or MongoDB (via Prisma ORM)
+- MongoDB (via Mongoose ORM)
 
 **External Integrations**
-- Microsoft Graph API (Outlook, Calendar, Teams)
+- Microsoft Graph API (Outlook, Calendar)
 - Email APIs (Gmail, Outlook)
 - Insurance portals/APIs
 
@@ -138,7 +138,7 @@ The platform uses CrewAI agents for intelligent automation:
 ### Prerequisites
 - Node.js 18+
 - Python 3.10+
-- PostgreSQL or MongoDB
+- MongoDB
 - Microsoft Azure AD application (for OAuth)
 
 ### Installation
@@ -147,7 +147,7 @@ The platform uses CrewAI agents for intelligent automation:
 
 ```bash
 cd web
-npm install
+pnpm install
 ```
 
 #### Backend API Setup
@@ -175,7 +175,7 @@ pip install -r requirements.txt
 ```bash
 # Start Next.js dev server
 cd web
-npm run dev
+pnpm dev
 # Opens http://localhost:3000
 ```
 
@@ -183,8 +183,8 @@ npm run dev
 
 ```bash
 cd web
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
 
 ## Usage
@@ -212,6 +212,10 @@ npm start
 - Export reports for team reviews
 
 ## API Routes
+
+### Agents
+- `POST /analysis` - Data Aggregator Agent and Renewal Scoring Agent workflow 
+- `POST /generate_detail` - Brief Generation Agent and Communication Agents (Email and Calender)
 
 ### Authentication
 - `POST /api/auth/register` - User registration
