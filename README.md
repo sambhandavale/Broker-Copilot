@@ -1,4 +1,4 @@
-## Overview<img width="4630" height="2632" alt="Frame 35223" src="https://github.com/user-attachments/assets/cef863ca-dfdf-4d98-9886-eac4763de026" />
+## <img width="4630" height="2632" alt="Frame 35223" src="https://github.com/user-attachments/assets/cef863ca-dfdf-4d98-9886-eac4763de026" />
 
 # Broker Copilot
 
@@ -13,6 +13,7 @@ Broker Copilot simplifies the policy renewal process for insurance brokers by:
 - **Continuous Learning**: AI learns from patterns to improve recommendations
 
 ## Architecture
+<img width="1757" height="764" alt="diagram-export-12-7-2025-1_23_56-AM" src="https://github.com/user-attachments/assets/13ec3b71-3241-4b14-b721-50480e727197" />
 
 ### Tech Stack
 
