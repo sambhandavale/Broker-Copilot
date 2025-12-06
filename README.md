@@ -1,8 +1,8 @@
+## Overview<img width="4630" height="2632" alt="Frame 35223" src="https://github.com/user-attachments/assets/cef863ca-dfdf-4d98-9886-eac4763de026" />
+
 # Broker Copilot
 
 An intelligent AI-powered insurance brokerage platform that automates policy renewals, client management, email communications, and meeting scheduling.
-
-## Overview
 
 Broker Copilot simplifies the policy renewal process for insurance brokers by:
 - **Unified Dashboard**: View all clients, policies, and upcoming renewals in one place
